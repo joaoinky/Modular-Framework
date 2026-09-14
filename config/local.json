@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "target": {"description": "Local simulation of documented nOS regressions; not an installed nOS audit"},
+  "execution": {
+    "timeout_seconds": 5,
+    "case_timeouts": {
+      "nvg06_established_sessions_direct": 30,
+      "nvg07_dns_leak_lan_resolver": 30,
+      "nvg08_airgap_false_success": 15,
+      "nvg10_vpn_dns_leak": 30,
+      "nvg11_vpn_udp_unrestricted": 30
+    }
+  },
+  "network": {
+    "mode": "simulation",
+    "library": "/usr/lib/neovanguard/neo-rede.sh",
+    "reference": "/usr/lib/neovanguard/network-policies.json",
+    "rules_dir": null
+  },
+  "key_exposure": {
+    "enabled": false,
+    "key_path": null,
+    "expected_uid": null,
+    "limits": {
+      "max_file_bytes": 262144,
+      "max_total_bytes": 1048576,
+      "max_files": 8,
+      "max_seconds": 5,
+      "max_directory_entries": 128
+    }
+  },
+  "extensions": {}
+}

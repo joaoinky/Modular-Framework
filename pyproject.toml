@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nvg-audit"
+version = "0.1.0"
+description = "Standalone three-state security regression framework for nOS"
+requires-python = ">=3.10"
+dependencies = ["nvg-key-material==0.1.0"]
+readme = "README.md"
+
+[project.scripts]
+nvg-audit = "nvg_audit.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+nvg_audit = ["rules/*.nft", "report.schema.json"]

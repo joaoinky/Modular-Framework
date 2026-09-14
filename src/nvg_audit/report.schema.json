@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NVG Audit report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "observed_at", "framework_version", "target", "plugins_executed", "results", "summary"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "framework_version": {"type": "string"},
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["description"], "properties": {"description": {"type": "string"}}
+    },
+    "plugins_executed": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "results": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["plugin", "case_id", "state", "reason", "evidence", "duration_ms"],
+        "properties": {
+          "plugin": {"type": "string"}, "case_id": {"type": "string"},
+          "state": {"enum": ["verified", "mismatch", "unknown"]},
+          "reason": {"type": "string", "minLength": 1},
+          "evidence": {"type": "object"},
+          "duration_ms": {"type": "number", "minimum": 0}
+        }
+      }
+    },
+    "summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["verified", "mismatch", "unknown"],
+      "properties": {
+        "verified": {"type": "integer", "minimum": 0},
+        "mismatch": {"type": "integer", "minimum": 0},
+        "unknown": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

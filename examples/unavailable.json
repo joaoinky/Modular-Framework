@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-09-13T20:12:46.896552+00:00",
+  "framework_version": "0.1.0",
+  "target": {
+    "description": "Local simulation of documented nOS regressions; not an installed nOS audit"
+  },
+  "plugins_executed": [
+    "key_exposure",
+    "network"
+  ],
+  "results": [
+    {
+      "plugin": "key_exposure",
+      "case_id": "key_nip49_envelope",
+      "state": "unknown",
+      "reason": "Key inspection disabled; explicit path, UID and opt-in required",
+      "evidence": {},
+      "duration_ms": 1.64
+    },
+    {
+      "plugin": "key_exposure",
+      "case_id": "key_owner_mode_0600",
+      "state": "unknown",
+      "reason": "Key inspection disabled; explicit path, UID and opt-in required",
+      "evidence": {},
+      "duration_ms": 1.292
+    },
+    {
+      "plugin": "network",
+      "case_id": "nvg06_established_sessions_direct",
+      "state": "unknown",
+      "reason": "Required namespace/network tools unavailable",
+      "evidence": {
+        "scope": "documented_rules_simulation",
+        "real_nos": false,
+        "missing_commands": [
+          "ip",
+          "nft"
+        ]
+      },
+      "duration_ms": 1.422
+    },
+    {
+      "plugin": "network",
+      "case_id": "nvg07_dns_leak_lan_resolver",
+      "state": "unknown",
+      "reason": "Required namespace/network tools unavailable",
+      "evidence": {
+        "scope": "documented_rules_simulation",
+        "real_nos": false,
+        "missing_commands": [
+          "ip",
+          "nft"
+        ]
+      },
+      "duration_ms": 1.361
+    },
+    {
+      "plugin": "network",
+      "case_id": "nvg08_airgap_false_success",
+      "state": "unknown",
+      "reason": "Required namespace/network tools unavailable",
+      "evidence": {
+        "scope": "documented_rules_simulation",
+        "real_nos": false,
+        "missing_commands": [
+          "ip",
+          "nft"
+        ]
+      },
+      "duration_ms": 1.915
+    },
+    {
+      "plugin": "network",
+      "case_id": "nvg10_vpn_dns_leak",
+      "state": "unknown",
+      "reason": "Required namespace/network tools unavailable",
+      "evidence": {
+        "scope": "documented_rules_simulation",
+        "real_nos": false,
+        "missing_commands": [
+          "ip",
+          "nft"
+        ]
+      },
+      "duration_ms": 1.527
+    },
+    {
+      "plugin": "network",
+      "case_id": "nvg11_vpn_udp_unrestricted",
+      "state": "unknown",
+      "reason": "Required namespace/network tools unavailable",
+      "evidence": {
+        "scope": "documented_rules_simulation",
+        "real_nos": false,
+        "missing_commands": [
+          "ip",
+          "nft"
+        ]
+      },
+      "duration_ms": 1.522
+    }
+  ],
+  "summary": {
+    "verified": 0,
+    "mismatch": 0,
+    "unknown": 7
+  }
+}

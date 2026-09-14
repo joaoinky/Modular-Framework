@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "target": {"description": "Negative control: reconstructed NVG-07 LAN DNS regression"},
+  "execution": {"timeout_seconds": 60},
+  "network": {"mode": "simulation", "rules_dir": "broken-nvg07"}
+}

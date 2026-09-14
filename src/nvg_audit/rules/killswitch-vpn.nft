@@ -1,0 +1,21 @@
+# Reconstructed scenario fixture. nvgvpn0 is a dummy, not an actual VPN.
+flush ruleset
+table inet audit_filter {
+    counter direct_drop {}
+    counter dns_drop {}
+    chain input { type filter hook input priority 0; policy accept; }
+    chain output {
+        type filter hook output priority 0; policy drop;
+        oifname "lo" accept
+        oifname "nvgvpn0" accept
+        udp dport 53 counter name dns_drop drop
+        tcp dport 53 counter name dns_drop drop
+        ip daddr 198.18.0.2 udp dport 51820 accept
+        ip6 daddr 2001:db8::2 udp dport 1194 accept
+        ip daddr 192.168.50.0/24 accept
+        ip6 daddr fd00:50::/64 accept
+        udp sport 68 udp dport 67 accept
+        meta l4proto ipv6-icmp accept
+        counter name direct_drop drop
+    }
+}

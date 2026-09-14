@@ -1,0 +1,7 @@
+BIP39 English wordlist
+Authors: Marek Palatinus, Pavol Rusnak, Aaron Voisine, Sean Bowe
+Source: https://raw.githubusercontent.com/bitcoin/bips/ce1862ac6bcffa1dd20aad858380e51e66e949ea/bip-0039/english.txt
+Commit: ce1862ac6bcffa1dd20aad858380e51e66e949ea
+SHA256: 2f5eed53a4727b4bf8880d8f3f199efc90e58503646d9ff8eff3a2ed3b24dbda
+License: MIT (BIP-0039)
+Vendored data only; scanner does not download this file.

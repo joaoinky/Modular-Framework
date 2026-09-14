@@ -1,0 +1,15 @@
+# Reconstructed scenario fixture, NOT the original nOS ruleset.
+flush ruleset
+table inet audit_filter {
+    counter direct_drop {}
+    counter dns_drop {}
+    chain input { type filter hook input priority 0; policy accept; }
+    chain output {
+        type filter hook output priority 0; policy drop;
+        oifname "lo" accept
+        meta skuid 43 accept
+        udp sport 68 udp dport 67 accept
+        meta l4proto ipv6-icmp accept
+        counter name direct_drop drop
+    }
+}

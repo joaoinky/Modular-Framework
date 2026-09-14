@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nvg-key-material"
+version = "0.1.0"
+description = "Engine-independent bounded key-material recognition extracted from NVG Scanner"
+requires-python = ">=3.10"
+dependencies = []
+readme = "README.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+nvg_key_material = ["data/*.txt"]
