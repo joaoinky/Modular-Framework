@@ -48,10 +48,16 @@ class KeyPluginTests(unittest.TestCase):
         self.config["key_exposure"]["expected_uid"] += 1
         self.assertEqual(plugin.permissions(self.config).state, "mismatch")
 
-    def test_missing_symlink_partial_and_disabled_unknown(self):
+    def test_declared_missing_file_is_mismatch(self):
         self.path.unlink()
-        self.assertEqual(plugin.envelope(self.config).state, "unknown")
-        self.assertEqual(plugin.permissions(self.config).state, "unknown")
+        report = execute(self.config, modules={"key_exposure": plugin})
+        self.assertEqual(report["summary"], {"verified": 0, "mismatch": 2, "unknown": 0})
+        self.config["key_exposure"]["key_path"] = str(self.path / "missing-parent" / "key")
+        self.assertEqual(plugin.envelope(self.config).state, "mismatch")
+        self.assertEqual(plugin.permissions(self.config).state, "mismatch")
+
+    def test_symlink_partial_and_disabled_unknown(self):
+        self.path.unlink()
         self.path.symlink_to("missing")
         self.assertEqual(plugin.envelope(self.config).state, "unknown")
         self.assertEqual(plugin.permissions(self.config).state, "unknown")
@@ -67,9 +73,23 @@ class KeyPluginTests(unittest.TestCase):
         with patch.object(plugin.Budget, "read", side_effect=Unavailable("private")):
             self.assertEqual(plugin.envelope(self.config).state, "unknown")
         with patch.object(plugin.os, "lstat", side_effect=PermissionError("private")):
+            self.assertEqual(plugin.envelope(self.config).state, "unknown")
             self.assertEqual(plugin.permissions(self.config).state, "unknown")
         with patch.object(plugin.Budget, "read", return_value=Read(NIP49.encode(), True, 0o600, os.getuid())):
             self.assertEqual(plugin.envelope(self.config).state, "unknown")
+
+    def test_detector_timeout_and_disappearance_during_read_unknown(self):
+        with patch.object(plugin, "detect", return_value=({}, {}, True)):
+            self.assertEqual(plugin.envelope(self.config).state, "unknown")
+        with patch.object(plugin.Budget, "read", side_effect=FileNotFoundError()):
+            self.assertEqual(plugin.envelope(self.config).state, "unknown")
+
+    def test_disabled_missing_path_is_not_inspected(self):
+        self.path.unlink()
+        self.config["key_exposure"]["enabled"] = False
+        with patch.object(plugin.os, "lstat", side_effect=AssertionError("must not inspect")):
+            self.assertEqual(plugin.envelope(self.config).state, "unknown")
+            self.assertEqual(plugin.permissions(self.config).state, "unknown")
 
     def test_invalid_envelope_mismatch_and_candidates_unknown(self):
         for text in ("nothing", "ncryptsec1invalid", NIP49[:-1] + "q"):

@@ -17,6 +17,24 @@ implementacao inventada a partir do README. Nenhum arquivo do scanner foi editad
 Wordlist, PROVENANCE.txt, LICENSE.txt e os vetores foram copiados integralmente.
 Esses hashes identificam codigo/dados publicos, nunca material coletado.
 
+## Teste de equivalencia comportamental
+
+Adicionado no follow-up: `tests/test_scanner_equivalence.py`, classe
+`ScannerEquivalenceTests`, teste `test_original_and_extracted_field_equivalence`.
+Executa o original do checkout local em subprocesso Python isolado, sem alterar
+o scanner nem torna-lo dependencia de runtime. Confere igualdade dos vetores
+JSON e da wordlist, depois compara todos os campos de `detect` (contagens,
+candidatos e timeout), validadores e `safe_location`. Inclui vetores publicos,
+combinacoes, corrupcoes, candidatos Shamir/bunker, caixa e prazo vencido.
+Nao prova equivalencia para toda entrada possivel nem cobre o coletor original.
+
+O checkout padrao e `../Hardening-scanner` em relacao ao framework. Configure
+`NVG_SCANNER_CHECKOUT` para exigir outro checkout: caminho explicito indisponivel
+falha, enquanto ausencia do checkout padrao gera skip explicito. O teste
+`test_public_vectors_match_extraction_baseline` sempre confere o hash registrado
+acima, mesmo sem scanner. Antes deste follow-up havia testes dos vetores no
+pacote extraido e comparacao textual da extracao, mas nao teste diferencial.
+
 Do check e do coletor foram separados os orcamentos e a leitura protegida em
 `files.py`. Nao foram copiados `Result`, scoring, Context, configuracao nOS ou
 o motor. A biblioteca oferece dados; cada consumidor decide a politica.

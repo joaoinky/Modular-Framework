@@ -29,7 +29,23 @@ sem editar resultados. Chaves nao foram lidas: opt-in desabilitado.
 `unshare --user --map-root-user --net true` retornou
 `Operation not permitted` antes de executar o comando interno.
 
-## Nao comprovado neste ambiente
+## Follow-up - 2026-09-14
+
+Suites reexecutadas com os fontes no `PYTHONPATH`: pacote comum com 15 testes
+aprovados; framework com 34 aprovados e 2 de integracao explicitamente pulados.
+Total: 49 aprovados. A comparacao diferencial com `../Hardening-scanner` passou
+tanto por descoberta automatica quanto com `NVG_SCANNER_CHECKOUT` explicito.
+Confere vetores, wordlist, contagens, candidatos, timeout, validadores e rotulos.
+O scanner original nao foi alterado.
+
+Novos testes distinguem arquivo declarado ausente (`mismatch`) de erro de
+acesso, desaparecimento durante leitura e timeout (`unknown`), e confirmam
+que opt-in desabilitado nao consulta nem mesmo um caminho ausente.
+NVG-09 e limites da interface nativa foram esclarecidos no README; nao houve
+integracao nativa nem execucao real de Shamir. Wheels e venv da rodada anterior
+nao foram reconstruidos neste follow-up; os resultados acima sao dos fontes.
+
+## Limites de integracao
 
 Nenhum cenario de trafego do framework foi executado em namespace real aqui.
 Nao houve compilacao das fixtures pelo nft nem demonstracao real da transicao

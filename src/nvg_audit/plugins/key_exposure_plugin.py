@@ -19,6 +19,14 @@ def envelope(config):
     policy = config["key_exposure"]
     evidence = {"location": safe_location(policy["key_path"])}
     try:
+        metadata = os.lstat(policy["key_path"])
+        if not stat.S_ISREG(metadata.st_mode):
+            return Outcome("unknown", "Expected key path is not a regular nonsymlink file", evidence)
+    except FileNotFoundError:
+        return Outcome("mismatch", "Declared key file is absent", evidence)
+    except OSError:
+        return Outcome("unknown", "Key metadata unavailable", evidence)
+    try:
         budget = Budget(Limits(**policy["limits"]))
         read = budget.read(policy["key_path"])
         counts, candidates, timed_out = detect(read.data.decode("utf-8", errors="replace"),
@@ -58,6 +66,8 @@ def permissions(config):
         if stat.S_IMODE(metadata.st_mode) != 0o600 or metadata.st_uid != policy["expected_uid"]:
             return Outcome("mismatch", "Key owner or exact mode 0600 differs from policy", evidence)
         return Outcome("verified", "Key owner and exact POSIX mode 0600 confirmed; ACLs not assessed", evidence)
+    except FileNotFoundError:
+        return Outcome("mismatch", "Declared key file is absent", evidence)
     except OSError:
         return Outcome("unknown", "Key metadata unavailable", evidence)
 

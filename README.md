@@ -97,6 +97,21 @@ e utilizado internamente pela biblioteca: esse contrato exige validacao no nOS.
 Nenhum caso padrao depende dele. A checagem nao autentica root comprometido nem
 elimina corridas causadas por quem ja controla os diretorios confiaveis.
 
+A assinatura `verify(config, mode) -> Outcome` pode ser preservada para esses
+quatro modos; isso nao e uma garantia de integracao validada com o nOS real.
+O contrato atual devolve estado, motivo e evidencia minima (modo solicitado e
+timestamp), nao os detalhes de interfaces, radios ou endpoints. A chamada tem
+limite de 5 segundos e 256 KiB de stdout; falhas viram `unknown`.
+Lacunas conhecidas para a proxima rodada: VPN exige interface e endpoints
+esperados (via extensao de configuracao ou argumentos opcionais); `reference`
+hoje e apenas checado quanto a confianca, nao passado a `network_verify`.
+Seu encaminhamento depende do mecanismo aceito pela biblioteca real. Casos
+que precisem de sondas de trafego ou evidencia detalhada nao serao resolvidos
+apenas conectando esta funcao: sera preciso ampliar a evidencia/adaptacao.
+Nenhuma mudanca de assinatura e necessaria nesta rodada; o contrato externo,
+os efeitos de `source` e a ausencia de alteracoes no host ainda devem ser
+validados antes de integrar casos nativos.
+
 ## Contrato e arquitetura
 
 Cada modulo confiavel `plugins/*_plugin.py` implementa o `Protocol` `Plugin`
@@ -148,7 +163,14 @@ Python nao garante apagamento de memoria, swap ou dumps externos.
 | `key_nip49_envelope` | Formato Bech32 completo NIP-49 v2, checksum, 91 bytes, campos estruturais; plaintext reconhecido pelo pacote comum e `mismatch` |
 | `key_owner_mode_0600` | Arquivo regular, UID configurado e modo POSIX exatamente 0600 |
 
-Ausencia, leitura parcial, timeout e candidato nao confirmado sao `unknown`.
+Com opt-in ativo, `key_path` declara um arquivo provisionado obrigatorio:
+ausencia confirmada por `lstat` (`ENOENT`, inclusive ancestral ausente) e
+`mismatch` nos dois casos. Falha de acesso/consulta nao comprova ausencia e
+permanece `unknown`. Symlink final, inclusive quebrado, e `unknown`.
+Se o arquivo desaparece depois do `lstat`, durante a leitura, o resultado do
+envelope e `unknown`: a observacao ficou incompleta. Nao ha garantia atomica.
+Leitura parcial, timeout e candidato nao confirmado tambem sao `unknown`.
+Sem opt-in, ambos sao `unknown` e nem sequer consultam o caminho.
 Envelope vazio/malformado e `mismatch`; versao desconhecida no mesmo envelope e
 `unknown`. Um envelope estruturalmente valido nao comprova autenticacao AEAD,
 senha correta/forte, autenticidade ou recuperabilidade. Nao ha decriptacao,
@@ -190,6 +212,17 @@ python3 -m unittest discover -s tests -v
 Testes unitarios usam `unittest`, mocks, vetores publicos e arquivos temporarios.
 Incluem leitura real, FIFO/symlink, checksums, tres estados, timeout, contratos
 nativos contraditorios e erros de comandos. Nenhuma chave pessoal e usada.
+
+`packages/nvg-key-material/tests/test_scanner_equivalence.py` compara o
+detector original em subprocesso isolado com o extraido, campo a campo,
+usando os mesmos vetores publicos e casos adicionais invalidos/candidatos.
+Por padrao procura `../Hardening-scanner`; sem esse checkout, somente a
+comparacao direta e pulada, e o hash dos vetores originais continua testado.
+Para exigir a comparacao (checkout ausente passa a ser falha):
+
+```sh
+NVG_SCANNER_CHECKOUT=/caminho/Hardening-scanner python3 -m unittest discover -s packages/nvg-key-material/tests -v
+```
 
 Para **exigir** integracao real, numa maquina Linux com `nft` (nftables), `ip`
 (iproute2), `unshare` (util-linux), IPv6, veth/dummy e permissao para namespaces:
@@ -268,6 +301,14 @@ esses scripts. Em particular:
   ou alterado. Formatos efetivos e comandos originais precisam de validacao.
 - NVG-05 e coberto apenas por testes do parser de verificacao e do modelo de
   invalidacao; nao ha caso de ponta a ponta do painel `neo-status`.
+- NVG-09 nao e regressao de rede: trata da recuperacao Shamir com partes de
+  divisoes diferentes, conforme a [quinta rodada](NVG-Doc/auditoria-erros/2026-09-09/correcoes-05.md).
+  Sua ausencia no README anterior foi uma omissao documental. Nao ha caso
+  NVG-09 nesta entrega: reconhecer candidatos `nvgs1`/`nvgs2` nao valida a
+  recuperacao. Pendencia: testar as funcoes reais de `neo-shamir` com vetores
+  sinteticos quando disponiveis, incluindo misturas, ID/CRC adulterados e
+  comportamento legado. Reimplementar Shamir a partir da documentacao nao
+  testaria o codigo original e foge ao escopo do detector sem reconstrucao.
 - NIP-49 e validado estruturalmente segundo a
   [especificacao oficial](https://github.com/nostr-protocol/nips/blob/master/49.md).
   O pacote nao implementa criptografia. As sondas usam a
